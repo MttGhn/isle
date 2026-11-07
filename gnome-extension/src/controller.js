@@ -22,7 +22,7 @@ import {ClipboardHistory} from './clipboard.js';
 import {CompactView} from './compact.js';
 import {HAS_ACCENT, grabsKeyboard, inhibitScanout, isWayland, onUiScale, px, uiScale} from './compat.js';
 import {Daemon} from './daemon.js';
-import {BOTTOM_PADDING, ExpandedView, PAGE_HEIGHT} from './expanded.js';
+import {BOTTOM_PADDING, ExpandedView, pageHeight} from './expanded.js';
 import {Island} from './island.js';
 import {AudioOutputs} from './audio.js';
 import {CallMonitor} from './call.js';
@@ -380,17 +380,17 @@ export class Controller {
 
     /** Makes each page, in tab order. */
     _pageMakers() {
-        const size = {height: PAGE_HEIGHT};
+        const size = name => ({height: pageHeight(name)});
         return [
-            () => new CallPage(this._daemon, this._call, this._privacy, this._settings, size),
-            () => new MediaPage(this._daemon, this._audio, size),
-            () => new NotificationsPage(this._daemon, this._notifications, size),
-            () => new TimerPage(this._daemon, size),
-            () => new TasksPage(this._daemon, size),
-            () => new ShelfPage(this._daemon, this._clipboard, this._settings, size),
-            () => new CalendarPage(this._daemon, this._settings, size),
-            () => new AppsPage(this._daemon, this._appUsage, size),
-            () => new UsagePage(this._daemon, size),
+            () => new CallPage(this._daemon, this._call, this._privacy, this._settings, size('call')),
+            () => new MediaPage(this._daemon, this._audio, size('music')),
+            () => new NotificationsPage(this._daemon, this._notifications, size('notifications')),
+            () => new TimerPage(this._daemon, size('focus')),
+            () => new TasksPage(this._daemon, size('reminders')),
+            () => new ShelfPage(this._daemon, this._clipboard, this._settings, size('shelf')),
+            () => new CalendarPage(this._daemon, this._settings, size('calendar')),
+            () => new AppsPage(this._daemon, this._appUsage, size('apps')),
+            () => new UsagePage(this._daemon, size('usage')),
         ];
     }
 
@@ -410,6 +410,9 @@ export class Controller {
             if (expanded.page === this._shelf)
                 this._shelfHelper?.prepare();
             this._shelfHelper?.sync();
+            // Matteo: pages differ in height, so the open island follows the new one.
+            if (this._presentation === 'expanded')
+                this._render();
         });
         expanded.connect('page-settled', () => this._shelfHelper?.sync());
         expanded.pageNamed('shelf').connect('helper-area-changed', () => this._shelfHelper?.sync());
@@ -1139,7 +1142,7 @@ export class Controller {
         case 'expanded':
             size = {
                 width: this._expanded.preferredWidth,
-                height: (this._onBar ? top : HEADER_WITHOUT_BAR * scale) + (PAGE_HEIGHT + BOTTOM_PADDING) * scale,
+                height: (this._onBar ? top : HEADER_WITHOUT_BAR * scale) + (pageHeight(this._expanded.page.name) + BOTTOM_PADDING) * scale,
                 radius: EXPANDED_RADIUS * scale,
                 shoulder: EXPANDED_SHOULDER * scale,
             };

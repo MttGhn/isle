@@ -129,6 +129,11 @@ export const CalendarPage = GObject.registerClass({
             height,
         });
         this.name = 'calendar';
+        // Matteo: a taller page gets a taller grid with bigger days (isle-calendar-tall).
+        this._gridHeight = GRID_HEIGHT + height - 150;
+        this._maxRowHeight = Math.round(MAX_ROW_HEIGHT * height / 150);
+        if (height > 150)
+            this.add_style_class_name('isle-calendar-tall');
         onUiScale(this, scale => (this.layout_manager.spacing = 24 * scale));
         this._today = startOfDay(new Date());
         /** The day whose events are listed. */
@@ -325,7 +330,7 @@ export const CalendarPage = GObject.registerClass({
         column.add_child(weekdays);
 
         this._grid = new St.BoxLayout({...VERTICAL, style_class: 'isle-cal-grid', y_align: Clutter.ActorAlign.START});
-        onUiScale(this._grid, scale => (this._grid.height = GRID_HEIGHT * scale));
+        onUiScale(this._grid, scale => (this._grid.height = this._gridHeight * scale));
         column.add_child(this._grid);
         return column;
     }
@@ -722,7 +727,7 @@ export const CalendarPage = GObject.registerClass({
         const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
         const lead = (month.getDay() - this._weekStart + 7) % 7;
         const rows = Math.ceil((lead + daysInMonth) / 7);
-        const rowHeight = px(Math.min(MAX_ROW_HEIGHT, Math.floor(GRID_HEIGHT / rows)));
+        const rowHeight = px(Math.min(this._maxRowHeight, Math.floor(this._gridHeight / rows)));
 
         this._grid.destroy_all_children();
         this._grid.set_style_class_name(rows > 5 ? 'isle-cal-grid isle-cal-six-weeks' : 'isle-cal-grid');

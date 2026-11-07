@@ -21,6 +21,13 @@ const EXPANDED_WIDTH = 600;
 /** The least room between the tabs and the status on the right. */
 const HEADER_GAP = 16;
 export const PAGE_HEIGHT = 150;
+/** Matteo: the pages that list things (notifications, reminders) or show a month open taller. */
+const TALL_PAGES = {notifications: 260, reminders: 260, calendar: 260};
+
+/** The height of the page called `name`, in CSS pixels. */
+export function pageHeight(name) {
+    return TALL_PAGES[name] ?? PAGE_HEIGHT;
+}
 /** Room below the page, as at its sides (.isle-page): 20 px all round, cards' 12 px corners concentric with the 32. */
 export const BOTTOM_PADDING = 20;
 
@@ -114,7 +121,7 @@ export const ExpandedView = GObject.registerClass({
         this.add_child(bottom);
         onUiScale(bottom, scale => {
             bottom.height = BOTTOM_PADDING * scale;
-            this._pagerArea.height = PAGE_HEIGHT * scale;
+            this._pagerArea.height = pageHeight(this.page.name) * scale;
         });
 
         for (const page of pages) {
@@ -499,6 +506,7 @@ export const ExpandedView = GObject.registerClass({
         }
 
         next.setActive(this._active);
+        this._pagerArea.height = px(pageHeight(next.name));
         this._syncPage();
         this._syncWidth();
         this.emit('tint-changed');

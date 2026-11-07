@@ -1581,3 +1581,13 @@
 #isleIsland.isle-glass-dark .isle-mode-toggle.on,
 #isleIsland.isle-glass-dark .isle-cal-world-toggle:checked,
 #isleIsland.isle-glass-dark .isle-dnd-toggle:checked { box-shadow: none; }
+
+/* Matteo: the taller calendar page (pages/calendar.js) has a bigger month, its days 28 px round. */
+.isle-calendar-tall .isle-cal-month { width: 238px; spacing: 4px; }
+.isle-calendar-tall .isle-cal-month-name,
+.isle-calendar-tall .isle-cal-year { font-size: 13px; }
+.isle-calendar-tall .isle-cal-weekday { width: 34px; font-size: 11px; }
+.isle-calendar-tall .isle-cal-cell { width: 34px; }
+.isle-calendar-tall .isle-cal-day { width: 28px; height: 28px; border-radius: 14px; font-size: 12px; }
+.isle-calendar-tall .isle-cal-six-weeks .isle-cal-day { width: 26px; height: 26px; border-radius: 13px; }
+.isle-calendar-tall .isle-cal-dot { width: 4px; height: 4px; border-radius: 2px; }
